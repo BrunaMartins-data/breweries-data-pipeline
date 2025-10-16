@@ -14,19 +14,23 @@ Data is ingested from the Open Brewery DB API, transformed, and aggregated into 
 
 2. Architecture Overview
 Medallion Flow
-API → Bronze (raw JSON)
-      ↓
-PySpark → Silver (cleaned and normalized Parquet)
-      ↓
-Aggregations → Gold (aggregated analytical data)
-      ↓
-Validation → Data Quality Checks
+API
+ ↓
+Bronze (raw JSON)
+ ↓
+Silver (cleaned + normalized Parquet)
+ ↓
+Gold (aggregated analytics)
+ ↓
+Validation (Data Quality Checks)
 
 Layer Descriptions
-Layer	Purpose	Output Format
-Bronze	Ingests raw data from the API using pagination and persists it historically.	JSONL
-Silver	Cleans, deduplicates, normalizes, and enforces schema before persisting to Parquet (partitioned by state and country).	Parquet
-Gold	Aggregates data into analytical summaries and validates quality rules (nulls, counts, schema).	Parquet
+| Layer  | Purpose                                                                        | Output Format |
+| ------ | ------------------------------------------------------------------------------ | ------------- |
+| Bronze | Ingests raw data from the API using pagination and persists it historically    | JSONL         |
+| Silver | Cleans, deduplicates, normalizes, and enforces schema before saving            | Parquet       |
+| Gold   | Aggregates data into analytical summaries and applies quality validation rules | Parquet       |
+
 
 3. Repository Structure
 .
@@ -62,6 +66,7 @@ Gold	Aggregates data into analytical summaries and validates quality rules (null
 ├── Makefile
 ├── entrypoint.sh
 └── README.md
+
 
 4. Environment Setup
 Requirements
