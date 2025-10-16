@@ -5,14 +5,14 @@ Role: Data Engineer
 Email: brunatavares81@gmail.com
 Version: Final (Production‑Ready)
 
-1. Overview
+### 1. Overview
 
 This project implements a complete data pipeline using Apache Airflow and PySpark, based on the Medallion Architecture (Bronze → Silver → Gold).
 It demonstrates robust data engineering practices, including modular orchestration, schema enforcement, observability, and automated data quality validation.
 
 Data is ingested from the Open Brewery DB API, transformed, and aggregated into analytical datasets suitable for reporting and analysis.
 
-2. Architecture Overview
+### 2. Architecture Overview
 Medallion Flow
 API
  ↓
@@ -32,43 +32,41 @@ Layer Descriptions
 | Gold   | Aggregates data into analytical summaries and applies quality validation rules | Parquet       |
 
 
-3. Repository Structure
-.
-├── dags/
-│   ├── breweries_ingestion_dag.py         # Bronze + Silver pipeline
-│   └── breweries_gold_dag.py              # Gold + Quality pipeline
-│
-├── src/
-│   ├── libs/
-│   │   ├── alerts.py                      # Alert callbacks and failure handling
-│   │   ├── observability.py               # Logging and monitoring utilities
-│   │   └── dag_utils.py                   # DAG generation utilities
-│   │
-│   └── pipelines/
-│       ├── breweries_fetch_bronze_notebook.py
-│       ├── breweries_transform_silver_notebook.py
-│       ├── breweries_aggregate_gold_notebook.py
-│       └── breweries_data_quality_gold.py
-│
-├── configs/
-│   ├── breweries_ingestion_pipeline.yml
-│   ├── breweries_gold_pipeline.yml
-│   └── metadata/
-│       ├── breweries_metadata_ingestion.yml
-│       └── breweries_metadata_gold.yml
-│
-├── tests/
-│   ├── test_dag_integrity.py              # Ensures DAGs load correctly
-│   └── test_validations.py                # Validates transformations and schema
-│
-├── Dockerfile
-├── docker-compose.yml
-├── Makefile
-├── entrypoint.sh
-└── README.md
+### 3. Repository Structure
+
+### 3. Repository Structure
+
+| Path                             | Description                                      |
+|----------------------------------|--------------------------------------------------|
+| `dags/`                          |                                                  |
+| ├── `breweries_ingestion_dag.py`| Bronze + Silver pipeline                         |
+| └── `breweries_gold_dag.py`     | Gold + Quality pipeline                          |
+| `src/libs/`                      |                                                  |
+| ├── `alerts.py`                 | Alert callbacks and failure handling             |
+| ├── `observability.py`          | Logging and monitoring utilities                 |
+| └── `dag_utils.py`              | DAG generation utilities                         |
+| `src/pipelines/`                |                                                  |
+| ├── `breweries_fetch_bronze_notebook.py`     | Bronze ingestion logic               |
+| ├── `breweries_transform_silver_notebook.py` | Silver transformation logic           |
+| ├── `breweries_aggregate_gold_notebook.py`   | Gold aggregation logic               |
+| └── `breweries_data_quality_gold.py`         | Gold layer validation rules          |
+| `configs/`                       |                                                  |
+| ├── `breweries_ingestion_pipeline.yml`       | YAML config for Bronze + Silver DAG |
+| ├── `breweries_gold_pipeline.yml`            | YAML config for Gold DAG             |
+| └── `metadata/`                 |                                                  |
+|     ├── `breweries_metadata_ingestion.yml`   | Metadata for ingestion               |
+|     └── `breweries_metadata_gold.yml`        | Metadata for gold                    |
+| `tests/`                         |                                                  |
+| ├── `test_dag_integrity.py`     | Ensures DAGs load correctly                      |
+| └── `test_validations.py`       | Validates transformations and schema             |
+| `Dockerfile`                    | Docker image definition                          |
+| `docker-compose.yml`           | Container orchestration                          |
+| `Makefile`                     | Helper commands                                  |
+| `entrypoint.sh`                | Script to initialize Airflow                     |
+| `README.md`                    | Project documentation                            |
 
 
-4. Environment Setup
+### 4. Environment Setup
 Requirements
 
 Docker and Docker Compose installed
@@ -97,7 +95,7 @@ make reset
 Access the Airflow container
 make exec
 
-5. DAG Execution
+### 5. DAG Execution
 Trigger DAGs manually
 docker exec -it breweries_airflow airflow dags trigger breweries_ingestion_daily_at_07
 docker exec -it breweries_airflow airflow dags trigger breweries_gold_daily_at_07_30
@@ -109,7 +107,7 @@ breweries_gold_daily_at_07_30	aggregate_gold, validate_gold_quality	Aggregates d
 View logs
 make logs
 
-6. Testing and Validation
+### 6. Testing and Validation
 
 Automated tests ensure integrity and consistency across the pipeline.
 
@@ -120,7 +118,7 @@ test_validations.py	Validates schema enforcement, deduplication, and null remova
 Run tests inside the container
 pytest tests/ --disable-warnings -v
 
-7. Observability and Monitoring
+### 7. Observability and Monitoring
 
 The project integrates structured observability through the following mechanisms:
 
@@ -135,7 +133,7 @@ MLflow for metric tracking (e.g., records processed per stage).
 
 Prometheus + Alertmanager for task success/failure metrics.
 
-8. Design Decisions
+### 8. Design Decisions
 Silver Layer Data Quality
 
 Data quality checks for the Silver layer are embedded directly in the transformation logic.
@@ -155,7 +153,7 @@ DAGs are dynamically generated using shared utilities.
 
 All tasks include retries, backoff policies, and structured logging.
 
-9. Containerization and Automation
+### 9. Containerization and Automation
 
 All Docker and orchestration commands are managed via a Makefile for reproducibility.
 
@@ -169,7 +167,7 @@ make exec	Open a shell inside the Airflow container
 make test	Validate permissions and run unit tests
 make sync	Sync DAGs and source code into the container
 
-10. Future Improvements
+### 10. Future Improvements
 
 Integrate CI/CD with GitHub Actions to automate pytest on pull requests.
 
@@ -179,7 +177,7 @@ Expand data quality validations with business rules for the Gold layer.
 
 Introduce data lineage tracking via OpenLineage integration.
 
-11. Author
+### 11. Author
 
 Bruna Martins
 Data Engineer
