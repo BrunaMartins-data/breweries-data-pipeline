@@ -1,0 +1,70 @@
+dag:
+  dag_id: breweries_gold_daily_at_07_30
+  description: "Gold layer aggregation and quality validation after ingestion completion"
+  schedule_interval: "30 7 * * *"
+  start_date: 2025-10-12
+  timezone: "America/Sao_Paulo"
+  catchup: false
+  max_active_runs: 1
+  owners: ["bruna"]
+  email_on_failure: "brunatavares81@gmail.com"
+  tags: ["breweries", "gold", "aggregation"]
+
+globals:
+  base_path: "/opt/airflow/data"
+  dataset: "breweries"
+  execution_date_fmt: "{{ ds }}"
+  observability:
+    log_json: true
+    prometheus_metrics: true
+    prometheus:
+      success_counter: "airflow_gold_success_total"
+      failure_counter: "airflow_gold_failure_total"
+
+dependency:
+  external_task_sensor:
+    enabled: true
+    dag_id: "breweries_ingestion_daily_at_07"
+    external_task_id: "validate_silver_quality"
+    poke_interval: 60
+    timeout: 3600
+    mode: "reschedule"
+
+stages:
+  - task_id: aggregate_gold
+    script: "breweries_aggregate_gold_notebook.py"
+    parameters:
+      script_path: "/opt/airflow/src/pipelines/breweries_aggregate_gold_notebook.py"
+      metadata_path: "/opt/airflow/configs/metadata/metadata_breweries_gold.yml"
+      input_path: "/opt/airflow/data/silver/breweries/{{ ds }}/"
+      output_path: "/opt/airflow/data/gold/breweries/{{ ds }}/"
+      aggregations:
+        - name: "by_state"
+          group_by: ["state"]
+          metrics:
+            - name: "brewery_count"
+              expr: "count(*)"
+        - name: "by_type"
+          group_by: ["brewery_type"]
+          metrics:
+            - name: "brewery_count"
+              expr: "count(*)"
+
+  - task_id: validate_gold_quality
+    depends_on: ["aggregate_gold"]
+    script: "breweries_data_quality_gold.py"
+    parameters:
+      script_path: "/opt/airflow/src/pipelines/breweries_data_quality_gold.py"
+      metadata_path: "/opt/airflow/configs/metadata/breweries_metadata_gold.yml"
+      input_path: "/opt/airflow/data/gold/breweries/{{ ds }}/"
+    quality_rules:
+      - rule: "No null values in brewery_type"
+        column: "brewery_type"
+        type: "not_null"
+      - rule: "No null values in city"
+        column: "city"
+        type: "not_null"
+      - rule: "Count > 0 for all states"
+        column: "total_breweries"
+        type: "greater_than_zero"
+

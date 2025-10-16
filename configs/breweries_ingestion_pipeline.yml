@@ -1,0 +1,64 @@
+dag:
+  dag_id: breweries_ingestion_daily_at_07
+  description: "Ingest raw brewery data (Bronze) and transform to columnar format (Silver)"
+  schedule_interval: "0 7 * * *"
+  start_date: 2025-10-12
+  timezone: "America/Sao_Paulo"
+  catchup: false
+  max_active_runs: 1
+  owners: ["bruna"]
+  email_on_failure: "brunatavares81@gmail.com"
+  tags: ["breweries", "bronze", "silver", "quality"]
+
+globals:
+  base_path: "/opt/airflow/data"
+  dataset: "breweries"
+  execution_date_fmt: "{{ ds }}"
+  observability:
+    log_json: true
+    prometheus_metrics: true
+
+stages:
+  # Bronze Layer
+  - task_id: fetch_data_bronze
+    script: "breweries_fetch_bronze_notebook.py"
+    parameters:
+      script_path: "/opt/airflow/src/pipelines/breweries_fetch_bronze_notebook.py"
+      metadata_path: "/opt/airflow/configs/metadata/breweries_metadata_ingestion.yml"
+      url: "https://api.openbrewerydb.org/v1/breweries"
+      pagination:
+        enabled: true
+        page_param: "page"
+        per_page_param: "per_page"
+        per_page_value: 50
+        max_pages: null
+      target_path: "/opt/airflow/data/bronze/breweries/{{ ds }}/raw.jsonl"
+      add_ingestion_date: true
+      atomic_write: true
+      timeout_seconds: 30
+      retries: 3
+      backoff_seconds: 2
+
+  # Silver Layer
+  - task_id: transform_silver
+    depends_on: ["fetch_data_bronze"]
+    script: "breweries_transform_silver_notebook.py"
+    parameters:
+      script_path: "/opt/airflow/src/pipelines/breweries_transform_silver_notebook.py"
+      metadata_path: "/opt/airflow/configs/metadata/breweries_metadata_ingestion.yml"
+      input_path: "/opt/airflow/data/bronze/breweries/{{ ds }}/raw.jsonl"
+      output_path: "/opt/airflow/data/silver/breweries/{{ ds }}/data.parquet"
+      output_format: "parquet"
+      partition_by: "state"
+      normalize:
+        trim_strings: true
+        lowercase_cols: true
+        cast_types:
+          id: "string"
+          name: "string"
+          brewery_type: "string"
+          city: "string"
+          state: "string"
+          country: "string"
+          latitude: "double?"
+          longitude: "double?"

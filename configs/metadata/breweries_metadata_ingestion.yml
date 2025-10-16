@@ -1,0 +1,42 @@
+dataset:
+  name: breweries_ingestion
+  description: "Ingest raw brewery data from API and transform to Silver (Parquet partitioned by state)"
+  owner: "brunatavares81@gmail.com"
+  layer: "silver"
+  created_at: "2025-10-12"
+  format: "parquet"
+  partition_by: "state"
+
+schema:
+  - name: id
+    type: string
+    description: "Unique brewery identifier"
+    nullable: false
+  - name: name
+    type: string
+    description: "Brewery name"
+    nullable: false
+  - name: brewery_type
+    type: string
+    description: "Type of brewery (micro, regional, brewpub, etc)"
+    nullable: true
+  - name: city
+    type: string
+    description: "City where the brewery is located"
+    nullable: true
+  - name: state
+    type: string
+    description: "State where the brewery is located (partition key)"
+    nullable: false
+  - name: country
+    type: string
+    description: "Country of the brewery"
+    nullable: true
+  - name: updated_at
+    type: timestamp
+    description: "Timestamp of last update from API"
+    nullable: true
+  - name: ingestion_date
+    type: date
+    description: "Date when the record was ingested from source"
+    nullable: false

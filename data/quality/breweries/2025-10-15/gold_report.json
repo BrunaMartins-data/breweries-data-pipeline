@@ -1,0 +1,17 @@
+[
+  {
+    "rule": "No null values in brewery_type",
+    "passed": true,
+    "invalid_count": 0
+  },
+  {
+    "rule": "No null values in city",
+    "passed": false,
+    "invalid_count": 51
+  },
+  {
+    "rule": "Count > 0 for all states",
+    "passed": true,
+    "invalid_count": 0
+  }
+]

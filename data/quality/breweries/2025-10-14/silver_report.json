@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "non_null_name",
+    "passed": true,
+    "invalid_count": 0
+  },
+  {
+    "rule": "valid_state",
+    "passed": true,
+    "invalid_count": 0
+  }
+]

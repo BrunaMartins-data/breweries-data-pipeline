@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
+  breweries_airflow:
+    build: .
+    container_name: breweries_airflow
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__FERNET_KEY=${AIRFLOW__CORE__FERNET_KEY}
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW_HOME=/opt/airflow
+      - PYTHONPATH=/opt/airflow:/opt/airflow/src:/opt/airflow/src/libs:/opt/airflow/src/pipelines:/opt/airflow/dags
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./src:/opt/airflow/src
+      - ./alerts:/opt/airflow/alerts
+      - ./configs:/opt/airflow/configs
+      - ./data:/opt/airflow/data
+      - ./tests:/opt/airflow/tests
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:

@@ -1,0 +1,46 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.ipynb_checkpoints
+
+# Virtual envs
+.venv/
+env/
+venv/
+
+# Airflow
+airflow.db
+airflow-webserver.pid
+logs/
+
+# Python tooling
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Jupyter and notebooks
+.ipynb_checkpoints/
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+.cache/
+
+# MLflow
+mlruns/
+
+# Output data
+data/bronze/
+data/silver/
+data/gold/
+
+# VSCode
+.vscode/
+
+# Docker
+*.log
+.env

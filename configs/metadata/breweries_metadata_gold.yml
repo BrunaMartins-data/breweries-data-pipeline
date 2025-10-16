@@ -1,0 +1,25 @@
+dataset:
+  name: breweries_gold
+  description: "Aggregated dataset with total breweries per type and location"
+  owner: "brunatavares81@gmail.com"
+  source_system: "Silver Layer"
+  layer: "gold"
+  created_at: "2025-10-12"
+
+schema:
+  - name: brewery_type
+    description: "Type of brewery (micro, regional, etc)"
+    type: string
+    nullable: false
+  - name: state
+    description: "State where the breweries are located"
+    type: string
+    nullable: false
+  - name: total_breweries
+    description: "Aggregated count of breweries per type and state"
+    type: integer
+    nullable: false
+  - name: transformation_date
+    description: "Date when aggregation was performed"
+    type: date
+    nullable: false
